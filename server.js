@@ -3,12 +3,13 @@ const connectDB = require('./config/db');
 
 const app = express();
 
+// Connect Database
 connectDB();
 
-app.use(express.json({ extended: false }));
+// Init Middleware
+app.use(express.json());
 
-app.get('/', (req, res) => res.send('Hello Word'));
-
+// Define Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 
