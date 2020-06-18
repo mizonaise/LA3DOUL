@@ -9,3 +9,8 @@ export const REGISTER_SUCCESS = 'REGISTER_SUCCESS';
 export const AUTH_ERROR = 'AUTH_ERROR';
 export const USER_LOADED = 'USER_LOADED';
 export const LOGOUT = 'LOGOUT';
+export const FORGET_FAIL = 'FORGET_FAIL';
+export const FORGET_SUCCESS = 'FORGET_SUCCESS'
+export const RESET_FAIL = 'RESET_FAIL';
+export const RESET_SUCCESS = 'RESET_SUCCESS'
+

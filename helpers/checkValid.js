@@ -38,30 +38,44 @@ exports.validRegister = [
 ];
 
 exports.validVerifyEmail = [
-  validEmail("email"),
+  validEmail('email'),
   // email_token
-  check("email_token")
+  check('email_token')
     .exists()
-    .withMessage("Email token is required")
+    .withMessage('Email token is required')
     .isString()
-    .withMessage("Email token must be a string")
+    .withMessage('Email token must be a string')
     .trim()
     .isLength({ min: 1 })
-    .withMessage("Email token must be at least 1 character")
+    .withMessage('Email token must be at least 1 character'),
 ];
 
-// exports.forgotPasswordValidator = [
-//   check('email')
-//     .not()
-//     .isEmpty()
-//     .isEmail()
-//     .withMessage('Must be a valid email address'),
-// ];
+exports.validForgetPassword = [validEmail('email')];
 
-// exports.resetPasswordValidator = [
-//   check('newPassword')
-//     .not()
-//     .isEmpty()
-//     .isLength({ min: 6 })
-//     .withMessage('Password must be at least  6 characters long'),
-// ];
+exports.validResetPassword = [
+  // email
+  validEmail('email'),
+  // email_token
+  check('email_token')
+    .exists()
+    .withMessage('Email token is required')
+    .isString()
+    .withMessage('Email token must be a string')
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage('Email token must be at least 1 character'),
+  // new password
+  validPassword('password'),
+  // confirm new password
+  // check('confirmNewPwd')
+  //   .exists()
+  //   .withMessage('Confirm new password is required')
+  //   .custom((confirmNewPwd, { req }) => {
+  //     if (confirmNewPwd !== req.body.newPwd) {
+  //       // trow error if passwords do not match
+  //       throw new Error('Passwords mismatch');
+  //     } else {
+  //       return confirmNewPwd;
+  //     }
+  //   }),
+];

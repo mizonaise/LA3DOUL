@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer');
 const normalize = require('normalize-url');
 const { validationResult } = require('express-validator');
 
+const utils = require('../utils');
 const User = require('../models/User');
 
 // exports.registerController = async (req, res) => {
@@ -203,7 +204,7 @@ exports.registerController = (req, res) => {
   }
 
   const { name, email, password } = req.body;
-  
+
   User.register(name, email, password, 'local')
     .then((rslt) => {
       if (rslt.success) {
@@ -268,4 +269,123 @@ exports.verifyEmailController = (req, res) => {
       }
     })
     .catch((err) => res.status(400).json({ errors: [{ msg: err.message }] }));
+};
+
+/**
+ * send email contains link to reset password
+ */
+exports.forgetPasswordController = async (req, res) => {
+  // check validation errors
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email } = req.body;
+  User.findOne({ email: email })
+    .then((user) => {
+      // check if email eists in DB
+      if (!user)
+        return {
+          success: false,
+          message: 'Email does not belong to any user',
+        };
+      // if (user.strategy !== "local")
+      //   return {
+      //     success: false,
+      //     message:
+      //       "This account does not have a password you can connect using Google or 42 Intranet account"
+      //   };
+      // email exists
+      // generate email_token and send reset_password email
+      user.token_reset_password = utils.uniqid();
+      return user.save();
+    })
+    .then((result) => {
+      if (
+        result &&
+        typeof result.success !== 'undefined' &&
+        result.success === false
+      ) {
+        return result;
+      }
+
+      const user = result;
+      console.log(user.name);
+      utils.sendResetPasswordEmail(
+        user.name,
+        user.email,
+        user.token_reset_password
+      );
+      return {
+        success: true,
+        message: 'Reset Password Email is sent',
+      };
+    })
+    .then((result) => {
+      return res
+        .status(result.success ? 200 : 400)
+        .json({ message: result.message });
+    })
+    .catch((err) => {
+      return res.status(400).json({ errors: [{ msg: err.message }] });
+    });
+};
+
+/**
+ * Reset Password using email_token
+ */
+exports.resetPasswordController = (req, res) => {
+  // check validation errors
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email, password, email_token } = req.body;
+  User.findOne({
+    email: email,
+    token_reset_password: email_token,
+    // strategy: 'local',
+  })
+    .then((user) => {
+      if (!user)
+        return {
+          success: false,
+          message: 'Bad email or email_token',
+        };
+      user.password = password;
+      user.token_reset_password = undefined;
+      return user.save();
+    })
+    .then((result) => {
+      if (
+        result &&
+        typeof result.success !== 'undefined' &&
+        result.success === false
+      ) {
+        return result;
+      }
+
+      return {
+        success: true,
+        message: 'Password updated successfully',
+      };
+    })
+    .then((result) => {
+      return res
+        .status(result.success ? 200 : 400)
+        .json({ message: result.message });
+    })
+    .catch((err) => {
+      return res.status(400).json({
+        errors: [
+          {
+            msg: err.message,
+          },
+        ],
+      });
+    });
 };

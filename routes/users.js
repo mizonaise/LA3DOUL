@@ -2,13 +2,32 @@ const express = require('express');
 
 const router = express.Router();
 
-const { validRegister, validVerifyEmail } = require('../helpers/checkValid');
-const { registerController, verifyEmailController } = require('./usersController');
+const {
+  validRegister,
+  validVerifyEmail,
+  validResetPassword,
+  validForgetPassword,
+} = require('../helpers/checkValid');
 
-// @route    POST api/register
-// @desc     Register user
+const {
+  registerController,
+  verifyEmailController,
+  resetPasswordController,
+  forgetPasswordController,
+} = require('./usersController');
+
 // @access   Public
 router.post('/register', validRegister, registerController);
 router.post('/verify_email', validVerifyEmail, verifyEmailController);
+router.post(
+  '/forget_password',
+  validForgetPassword,
+  forgetPasswordController
+);
+router.post(
+  '/reset_password',
+  validResetPassword,
+  resetPasswordController
+);
 
 module.exports = router;

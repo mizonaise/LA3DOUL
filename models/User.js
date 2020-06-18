@@ -26,6 +26,9 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  token_reset_password: {
+    type: String,
+  },
   token_confirm_account: {
     type: String,
   },
@@ -35,29 +38,26 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-UserSchema.pre("save", function(next) {
-  if (
-    this.password !== undefined &&
-    (this.isModified("password") || this.isNew)
-  ) {
-    bcrypt.genSalt(10, (err, salt) => {
-      if (err) throw err;
-      bcrypt.hash(this.password, salt, (err, hash) => {
-        if (err) return next(err);
-        this.password = hash;
-        next();
-      });
-    });
-  } else {
-    next();
-  }
-});
+// UserSchema.pre('save', function (next) {
+//   if (
+//     this.password !== undefined &&
+//     (this.isModified('password') || this.isNew)
+//   ) {
+//     bcrypt.genSalt(10, (err, salt) => {
+//       if (err) throw err;
+//       bcrypt.hash(this.password, salt, (err, hash) => {
+//         if (err) return next(err);
+//         this.password = hash;
+//         next();
+//       });
+//     });
+//   } else {
+//     next();
+//   }
+// });
 
-UserSchema.statics.register = (
-  name,
-  email,
-  password,
-) => {
+UserSchema.statics.register = (name, email, password) => {
+
   const User = mongoose.model('user', UserSchema);
   // check if email already exists
   return User.findOne({ email })
@@ -82,7 +82,11 @@ UserSchema.statics.register = (
           .save()
           .then((user) => {
             // send verification email
-            utils.sendConfirmationEmail(user.email, name,user.token_confirm_account);
+            utils.sendConfirmationEmail(
+              user.name,
+              user.email,
+              user.token_confirm_account
+            );
             // return rslt
             return {
               success: true,

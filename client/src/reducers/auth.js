@@ -8,6 +8,8 @@ import {
   AUTH_ERROR,
   USER_LOADED,
   LOGOUT,
+  FORGET_FAIL,
+  FORGET_SUCCESS,
 } from '../actions/types';
 
 const initialState = {
@@ -38,8 +40,10 @@ export default function (state = initialState, action) {
         isAuthenticated: true,
         loading: false,
       };
+    case FORGET_FAIL:
     case VERIFY_FAIL:
     case REGISTER_FAIL:
+    case FORGET_SUCCESS:
     case VERIFY_SUCCESS:
     case REGISTER_SUCCESS:
       return {

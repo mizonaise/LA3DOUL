@@ -24,7 +24,6 @@ const Login = ({ login, isAuthenticated }) => {
   if (isAuthenticated) {
     return <Redirect to='/dashboard' />;
   }
-
   return (
     <React.Fragment>
       <h1 className='large text-primary'>Sign In</h1>
@@ -52,6 +51,9 @@ const Login = ({ login, isAuthenticated }) => {
             minLength='6'
           />
         </div>
+        <p className='my-1 text-right'>
+          <Link to='/forget_password'>Forget Password!</Link>
+        </p>
         <input type='submit' className='btn btn-primary' value='Login' />
       </form>
       <p className='my-1'>
