@@ -10,8 +10,8 @@ connectDB();
 app.use(express.json());
 
 // Define Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
+app.use('/api', require('./routes/auth'));
+app.use('/api', require('./routes/users'));
 
 const PORT = process.env.PORT || 5000;
 

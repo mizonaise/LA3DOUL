@@ -2,65 +2,270 @@ const config = require('config');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
+const nodemailer = require('nodemailer');
 const normalize = require('normalize-url');
 const { validationResult } = require('express-validator');
 
 const User = require('../models/User');
 
-exports.registerController = async (req, res) => {
+// exports.registerController = async (req, res) => {
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return res.status(400).json({ errors: errors.array() });
+//   }
+
+//   const { name, email, password } = req.body;
+
+//   try {
+//     let user = await User.findOne({ email });
+
+//     if (user) {
+//       return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
+//     }
+
+//     user = new User({
+//       name,
+//       email,
+//       password,
+//     });
+
+//     const salt = await bcrypt.genSalt(10);
+
+//     user.password = await bcrypt.hash(password, salt);
+
+//     const token = jwt.sign(
+//       {
+//         name,
+//         email,
+//         password,
+//       },
+//       config.get('jwtActivation'),
+//       { expiresIn: '5m' }
+//     );
+
+//     const emailData = {
+//       from: config.get('user'),
+//       to: email,
+//       subject: 'Account activation link',
+//       html: `
+//                 <h1>Please use the following to activate your account</h1>
+//                 <p>${config.get('client')}/users/activate/${token}</p>
+//                 <hr />
+//                 <p>This email may containe sensetive information</p>
+//                 <p>${config.get('client')}</p>
+//             `,
+//     };
+
+//     let transporter = nodemailer.createTransport({
+//       service: 'gmail',
+//       auth: {
+//         user: config.get('user'),
+//         pass: config.get('pass'),
+//       },
+//     });
+
+//     transporter.sendMail(emailData, function (err) {
+//       if (err) throw err;
+//       else
+//         return res.json({
+//           message: `Email has been sent to ${email}`,
+//         });
+//     });
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).send('Server error');
+//   }
+// };
+
+// exports.activationController = async (req, res) => {
+//   const { token } = req.body;
+
+//   if (token) {
+//     jwt.verify(token, config.get('jwtActivation'), async (err) => {
+//       if (err) {
+//         console.error(err.message);
+//         return res.status(401).json({
+//           errors: 'Expired link. Signup again',
+//         });
+//       } else {
+//         try {
+//           const { name, email, password } = jwt.decode(token);
+
+//           const avatar = normalize(
+//             gravatar.url(email, {
+//               s: '200',
+//               r: 'pg',
+//               d: 'mm',
+//             }),
+//             { forceHttps: true }
+//           );
+
+//           user = new User({
+//             name,
+//             email,
+//             avatar,
+//             password,
+//           });
+
+//           await user.save();
+
+//           const payload = {
+//             user: {
+//               id: user.id,
+//             },
+//           };
+
+//           jwt.sign(
+//             payload,
+//             config.get('jwtSecret'),
+//             { expiresIn: '5 days' },
+//             (err, token) => {
+//               if (err) throw err;
+//               res.json({ token });
+//             }
+//           );
+//         } catch (err) {
+//           console.error(err.message);
+//           res.status(500).send('Server error');
+//         }
+//       }
+//     });
+//   } else {
+//     return res
+//       .status(400)
+//       .json({ errors: [{ msg: 'error happening please try again' }] });
+//   }
+// };
+
+// exports.registerController = async (req, res) => {
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return res.status(400).json({ errors: errors.array() });
+//   }
+
+//   const { name, email, password } = req.body;
+
+//   try {
+//     let user = await User.findOne({ email });
+
+//     if (user) {
+//       return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
+//     }
+
+//     const avatar = normalize(
+//       gravatar.url(email, {
+//         s: '200',
+//         r: 'pg',
+//         d: 'mm',
+//       }),
+//       { forceHttps: true }
+//     );
+
+//     user = new User({
+//       name,
+//       email,
+//       avatar,
+//       password,
+//     });
+
+//     const salt = await bcrypt.genSalt(10);
+
+//     user.password = await bcrypt.hash(password, salt);
+
+//     await user.save();
+
+//     const payload = {
+//       user: {
+//         id: user.id,
+//       },
+//     };
+
+//     jwt.sign(
+//       payload,
+//       config.get('jwtSecret'),
+//       { expiresIn: '5 days' },
+//       (err, token) => {
+//         if (err) throw err;
+//         res.json({ token });
+//       }
+//     );
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).send('Server error');
+//   }
+// };
+
+exports.registerController = (req, res) => {
+  // check validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
   const { name, email, password } = req.body;
-
-  try {
-    let user = await User.findOne({ email });
-
-    if (user) {
-      return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
-    }
-
-    const avatar = normalize(
-      gravatar.url(email, {
-        s: '200',
-        r: 'pg',
-        d: 'mm',
-      }),
-      { forceHttps: true }
-    );
-
-    user = new User({
-      name,
-      email,
-      avatar,
-      password,
-    });
-
-    const salt = await bcrypt.genSalt(10);
-
-    user.password = await bcrypt.hash(password, salt);
-
-    await user.save();
-
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
-
-    jwt.sign(
-      payload,
-      config.get('jwtSecret'),
-      { expiresIn: '5 days' },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
+  
+  User.register(name, email, password, 'local')
+    .then((rslt) => {
+      if (rslt.success) {
+        // util.sendConfirmationEmail(email, rslt.username, rslt.email_token);
+        return res.status(200).json({
+          message: 'register_success_email_sent',
+        });
       }
-    );
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+      return res.status(400).json({ message: rslt.message });
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(400).json({
+        message: `Error Occured in User.controller.register: ${err}`,
+      });
+    });
+};
+
+exports.verifyEmailController = (req, res) => {
+  // check validation errors
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
+
+  const { email_token, email } = req.body;
+
+  User.findOne({ token_confirm_account: email_token })
+    .then((user) => {
+      if (user) {
+        // email_token exists
+        if (user.email === email) {
+          // all infos are ok
+          // verify user account
+          user.isVerified = true;
+          // delete token_confirm_account field
+          user.token_confirm_account = undefined;
+          return user
+            .save()
+            .then((user) =>
+              res.status(200).json({
+                success: true,
+                message: 'Account Verified Successfully',
+              })
+            )
+            .catch((err) =>
+              res.status(400).json({
+                errors: [{ msg: err.message }],
+              })
+            );
+        } else {
+          // email does not belong to this email_token
+          return res
+            .status(400)
+            .json({ errors: [{ msg: 'Bad email or email_token' }] });
+        }
+      } else {
+        // email_token does not exists
+        return res
+          .status(400)
+          .json({ errors: [{ msg: 'Bad email or email_token' }] });
+      }
+    })
+    .catch((err) => res.status(400).json({ errors: [{ msg: err.message }] }));
 };

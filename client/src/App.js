@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 import store from './store';
 import Login from './components/auth/Login';
+import Verify from './components/auth/Verify';
 import Alert from './components/layout/Alert';
 import Navbar from './components/layout/Navbar';
 import Register from './components/auth/Register';
@@ -33,6 +34,7 @@ const App = () => {
             <Switch>
               <Route exact path='/login' component={Login} />
               <Route exact path='/register' component={Register} />
+              <Route exact path='/verify_email/:token' component={Verify} />
               <PrivateRoute exact path='/dashboard' component={Dashboard} />
             </Switch>
           </section>

@@ -10,7 +10,7 @@ const router = express.Router();
 // @route    GET api/auth
 // @desc     Get user by token
 // @access   Private
-router.get('/', auth, async (req, res) => {
+router.get('/auth', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
     res.json(user);
@@ -20,9 +20,9 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// @route    POST api/auth
+// @route    POST api/login
 // @desc     Authenticate user & get token
 // @access   Public
-router.post('/', validLogin, loginController);
+router.post('/login', validLogin, loginController);
 
 module.exports = router;

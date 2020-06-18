@@ -1,38 +1,53 @@
 const { check } = require('express-validator');
 
-exports.validSign = [
-  check('name', 'Name is required')
-    .notEmpty()
-    .isLength({
-      min: 2,
-      max: 52,
-    })
-    .withMessage('name must be between 2 to 52 characters'),
-  check('email').isEmail().withMessage('Must be a valid email address'),
-  check('password', 'password is required').notEmpty(),
-  check('password')
-    .isLength({
-      min: 8,
-    })
-    .withMessage('Password must contain at least 8 characters')
+const validName = (fieldName) =>
+  check(fieldName)
+    .exists()
+    .withMessage('Name is required')
+    .isLength({ min: 2, max: 52 })
+    .withMessage('name must be between 2 to 52 characters')
+    .isAlpha()
+    .withMessage('Name must be only alphabetical chars');
+
+const validEmail = (email) =>
+  check(email)
+    .exists()
+    .withMessage('Email is required')
+    .isEmail()
+    .withMessage('Must be a valid email address');
+
+const validPassword = (passwoed) =>
+  check(passwoed)
+    .exists()
+    .withMessage('Password is required')
+    .isString()
+    .withMessage('Password must be String')
+    .isLength({ min: 8, max: 52 })
+    .withMessage('Password must be between 8 to 52 characters')
     .matches(/\d/)
     .withMessage('Password must contain at least one number (0-9)')
     .matches(/[a-zA-Z]/)
-    .withMessage('Password must contain at least one letter (a-z)'),
+    .withMessage('Password must contain at least one letter (a-z)');
+
+exports.validLogin = [validEmail('email'), validPassword('password')];
+
+exports.validRegister = [
+  validName('name'),
+  validEmail('email'),
+  validPassword('password'),
 ];
 
-exports.validLogin = [
-  check('email').isEmail().withMessage('Must be a valid email address'),
-  check('password', 'password is required').notEmpty(),
-  check('password')
-    .isLength({
-      min: 8,
-    })
-    .withMessage('Password must contain at least 8 characters')
-    .matches(/\d/)
-    .withMessage('Password must contain at least one number (0-9)')
-    .matches(/[a-zA-Z]/)
-    .withMessage('Password must contain at least one letter (a-z)'),
+exports.validVerifyEmail = [
+  validEmail("email"),
+  // email_token
+  check("email_token")
+    .exists()
+    .withMessage("Email token is required")
+    .isString()
+    .withMessage("Email token must be a string")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Email token must be at least 1 character")
 ];
 
 // exports.forgotPasswordValidator = [
