@@ -38,23 +38,23 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-// UserSchema.pre('save', function (next) {
-//   if (
-//     this.password !== undefined &&
-//     (this.isModified('password') || this.isNew)
-//   ) {
-//     bcrypt.genSalt(10, (err, salt) => {
-//       if (err) throw err;
-//       bcrypt.hash(this.password, salt, (err, hash) => {
-//         if (err) return next(err);
-//         this.password = hash;
-//         next();
-//       });
-//     });
-//   } else {
-//     next();
-//   }
-// });
+UserSchema.pre('save', function (next) {
+  if (
+    this.password !== undefined &&
+    (this.isModified('password') || this.isNew)
+  ) {
+    bcrypt.genSalt(10, (err, salt) => {
+      if (err) throw err;
+      bcrypt.hash(this.password, salt, (err, hash) => {
+        if (err) return next(err);
+        this.password = hash;
+        next();
+      });
+    });
+  } else {
+    next();
+  }
+});
 
 UserSchema.statics.register = (name, email, password) => {
 
