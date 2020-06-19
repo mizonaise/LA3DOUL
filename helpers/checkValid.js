@@ -79,3 +79,5 @@ exports.validResetPassword = [
   //     }
   //   }),
 ];
+
+exports.validUpdateName = [validName('name')];

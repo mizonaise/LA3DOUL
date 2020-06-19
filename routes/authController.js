@@ -46,3 +46,36 @@ exports.loginController = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
+exports.updateController = async (req, res) => {
+  //Check errors
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { name, email } = req.body;
+
+  User.findOne({ email: email })
+    .then((user) => {
+      if (user) {
+        user.name = name;
+        return user
+          .save()
+          .then(() =>
+            res.status(200).json({
+              success: true,
+              message: 'Name Update Successfully',
+            })
+          )
+          .catch((err) =>
+            res.status(400).json({
+              errors: [{ msg: err.message }],
+            })
+          );
+      } else {
+        return res.status(400).json({ errors: [{ msg: 'User not found' }] });
+      }
+    })
+    .catch((err) => res.status(400).json({ errors: [{ msg: err.message }] }));
+};

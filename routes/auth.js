@@ -2,8 +2,8 @@ const express = require('express');
 
 const User = require('../models/User');
 const auth = require('../middleware/auth');
-const { validLogin } = require('../helpers/checkValid');
-const { loginController } = require('./authController');
+const { validLogin, validUpdateName } = require('../helpers/checkValid');
+const { loginController, updateController } = require('./authController');
 
 const router = express.Router();
 
@@ -24,5 +24,7 @@ router.get('/auth', auth, async (req, res) => {
 // @desc     Authenticate user & get token
 // @access   Public
 router.post('/login', validLogin, loginController);
+
+router.put('/update', [auth, validUpdateName], updateController);
 
 module.exports = router;

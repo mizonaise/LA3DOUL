@@ -179,6 +179,26 @@ export const forget = (email) => async (dispatch) => {
   }
 };
 
+export const profile = (name, email) => async (dispatch) => {
+  console.log(name);
+  console.log('layn3Lk');
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  const body = JSON.stringify({ name, email });
+
+  try {
+    const res = await axios.put('/api/update', body, config);
+  } catch (err) {
+    const errors = err.response.data.errors;
+
+    if (errors)
+      errors.forEach((error) => dispatch(setAlert(error.msg, 'danger')));
+  }
+};
+
 export const logout = () => (dispatch) => {
   dispatch({ type: LOGOUT });
 };

@@ -10,6 +10,7 @@ import Reset from './components/auth/Reset';
 import Forget from './components/auth/Forget';
 import Verify from './components/auth/Verify';
 import Alert from './components/layout/Alert';
+import Profile from './components/user/Profile';
 import Navbar from './components/layout/Navbar';
 import Register from './components/auth/Register';
 import Landing from './components/layout/Landing';
@@ -40,6 +41,7 @@ const App = () => {
               <Route exact path='/forget_password' component={Forget} />
               <Route exact path='/reset_password/:token' component={Reset} />
               <Route exact path='/verify_email/:token' component={Verify} />
+              <PrivateRoute exact path='/profile' component={Profile} />
               <PrivateRoute exact path='/dashboard' component={Dashboard} />
             </Switch>
           </section>
